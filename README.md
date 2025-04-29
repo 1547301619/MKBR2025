@@ -1,4 +1,4 @@
-# Fast Multi-key Boostrapping from (R)LWE and
+# Fast Multi-key Bootstrapping Instantiated with NTRU and (R)LWE
 
 ### 1.Requirements
 
