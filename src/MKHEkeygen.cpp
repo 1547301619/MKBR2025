@@ -5,9 +5,6 @@
 #include <cmath>
 #include <iostream>
 
-
-
-
 //s1,...,sk
 void MKLweKeyGen(MKLweKey &result,MKHEParams *parmk){
      Sampler s(parLWE);
@@ -24,10 +21,8 @@ void MKRLweKeyGen(MKRLweKey &result,MKHEParams *parmk){
      int N2p1=N/2+1;
      int d=parmk->d_r;
      int Q=parmk->Q;
-
      ModQPoly tmp(N);
      FFTPoly tmp_FFT(N2p1);
-
      //generate CRS a in RQ^d
      vector<FFTPoly> a;
      for(int i=0;i<d;i++){
@@ -54,10 +49,7 @@ void MKRLweKeyGen(MKRLweKey &result,MKHEParams *parmk){
 
           }
           else{ //zi
-               // get_ternary_vector(tmp);
-               // get_binary_vector(tmp);
                get_gaussian_vector(tmp,parmk->stdev_RLWEkey);  
-               // get_hwt_vector(tmp,parmk->h);
                result.MKRLweKey_SK_poly.push_back(tmp);
                fftN.to_fft(z_FFT,tmp);
                result.MKRLweKey_SK.push_back(z_FFT);
@@ -75,8 +67,6 @@ void MKRLweKeyGen(MKRLweKey &result,MKHEParams *parmk){
      result.MKRLweKey_PK.push_back(a);
 }
 
-
-
 void HybridProduct_rksk(vector<ModQPoly>& c,const HPK& hpk,const MKRLweKey& mkrlwe_key,MKHEParams *parmk){
     int k=parmk->parties;
     assert(c.size()==k+1);  //c0,..,ck
@@ -86,11 +76,9 @@ void HybridProduct_rksk(vector<ModQPoly>& c,const HPK& hpk,const MKRLweKey& mkrl
     int B=parmk->B_r;
     int shift=parmk->shift_r;
     int Q=parmk->Q;
-
     int party=hpk.party;
     vector<int> tmp_poly(N);
     vector<long> tmp_poly_long(N);
-
 
     //vi= g^-1(ci)*bi  
     vector<ModQPoly> v(k+1);
@@ -131,10 +119,8 @@ void HybridProduct_rksk(vector<ModQPoly>& c,const HPK& hpk,const MKRLweKey& mkrl
         c[0][i]+=w0[i];
         c[party][i]+=w1[i];
     }
-
     mod_q_boot(c[0]);
     mod_q_boot(c[party]);
-    
 }
 
 //Only z_i and a in mkrlwekey is used
@@ -146,18 +132,13 @@ void HPKGen(HPK& hpk,const MKRLweKey &mkrlwe_key,const ModQPoly& f,int party,MKH
      int B=parmk->B_r;
      int d=parmk->d_r;
 
-
-     // Sampler s(parLWE);  
      ModQPoly tmp(N);
      FFTPoly tmp_FFT(N2p1);
-
      vector<FFTPoly> d0(d);
      vector<FFTPoly> d1(d);
      vector<FFTPoly> d2(d);
-
      FFTPoly z_FFT=mkrlwe_key.MKRLweKey_SK[party];
      vector<FFTPoly> a=mkrlwe_key.MKRLweKey_PK[parties+1];
-
      ModQPoly r(N);
      ModQPoly e(N);
      FFTPoly r_FFT(N2p1);
@@ -165,9 +146,6 @@ void HPKGen(HPK& hpk,const MKRLweKey &mkrlwe_key,const ModQPoly& f,int party,MKH
      FFTPoly f_FFT(N2p1);
      fftN.to_fft(f_FFT,f);
      FFTPoly fPOWB_FFT=f_FFT;
-
-     // get_ternary_vector(r);
-     // get_binary_vector(tmp);
      get_gaussian_vector(r,parmk->stdev_RLWEkey); 
      fftN.to_fft(r_FFT,r);
      FFTPoly rPOWB_FFT=r_FFT;
@@ -193,15 +171,9 @@ void HPKGen(HPK& hpk,const MKRLweKey &mkrlwe_key,const ModQPoly& f,int party,MKH
           d2[i]=tmp_FFT;
           mult_fft_poly_by_int(rPOWB_FFT,B);
      }
-
      hpk.party=party;
      hpk.hpk_FFT={d0,d1,d2};
-
-     
 }
-
-
-
 
 void MKrkskGen(vector<vector<FFTPoly>> &mkrksk,const vector<HPK>& mkhpk,const MKRLweKey &mkrlwe_key,MKHEParams *parmk){
      int Q=parmk->Q;
@@ -209,7 +181,6 @@ void MKrkskGen(vector<vector<FFTPoly>> &mkrksk,const vector<HPK>& mkhpk,const MK
      int k=parmk->parties;
      int B=parmk->B_r;
      int d=parmk->d_r;
-
 
      ModQPoly tmp_poly(N,0);
      vector<long> tmp_long(N);
@@ -234,12 +205,9 @@ void MKrkskGen(vector<vector<FFTPoly>> &mkrksk,const vector<HPK>& mkhpk,const MK
                fftN.to_fft(tmp_fft,mkrlwe_c[j]);
                mkrksk[j][i]=tmp_fft;
           }
-
           powB*=B;
      }
 }
-
-
 
 void MKHPKGen(vector<HPK>& mkhpk,const MKRLweKey &mkrlwe_key,const vector<SKey_boot>& vec_sk_boot,MKHEParams *parmk){
      int parties=parmk->parties;
@@ -305,7 +273,6 @@ void NRKGen(vector<vector<FFTPoly>> &nrksk0,vector<RGSWKey> &nrksk1,const vector
           }
      }
      vector<FFTPoly> a=mkrlwe_key.MKRLweKey_PK[k+1];
-
      //nrksk0=(br+f1g+e,ar+e) party1
      nrksk0=vector<vector<FFTPoly>>(2,vector<FFTPoly>(d));
      get_gaussian_vector(r,parmk->stdev_RLWEkey);
@@ -324,16 +291,13 @@ void NRKGen(vector<vector<FFTPoly>> &nrksk0,vector<RGSWKey> &nrksk1,const vector
           nrksk0[1][i]=tmp_FFT2;
           mult_fft_poly_by_int(fPOWB_FFT,B);
      }
-
      // nrksk1 party 2-k
      vector<vector<FFTPoly>> RGSW_row1(2,vector<FFTPoly>(d));
      vector<vector<FFTPoly>> RGSW_row2(2,vector<FFTPoly>(d));
      vector<vector<vector<FFTPoly>>> RGSWkey(2);
      for(int i=1;i<k;i++){
-
           f=vec_sk_boot[i].sk;
           fftN.to_fft(f_FFT,f);
-
           //row1
           get_gaussian_vector(r,parmk->stdev_RLWEkey);
           fftN.to_fft(r_FFT,r);
@@ -349,7 +313,6 @@ void NRKGen(vector<vector<FFTPoly>> &nrksk0,vector<RGSWKey> &nrksk1,const vector
                RGSW_row1[1][j]=tmp_FFT2;
                mult_fft_poly_by_int(fPOWB_FFT,B);
           }
-
           //row2
           get_gaussian_vector(r,parmk->stdev_RLWEkey);
           fftN.to_fft(r_FFT,r);
@@ -365,13 +328,10 @@ void NRKGen(vector<vector<FFTPoly>> &nrksk0,vector<RGSWKey> &nrksk1,const vector
                RGSW_row2[1][j]=tmp_FFT2;
                mult_fft_poly_by_int(fPOWB_FFT,B);
           }
-
           RGSWkey[0]=RGSW_row1;
           RGSWkey[1]=RGSW_row2;
           nrksk1.push_back(RGSWkey);
      }
-
-
 }
 
 void BRKGen(vector<NGSFFTctxt>& BRK,const SKey_base_LWE& sk_base, const SKey_boot& sk_boot,MKHEParams *parmk){
@@ -387,32 +347,19 @@ void BRKGen(vector<NGSFFTctxt>& BRK,const SKey_base_LWE& sk_base, const SKey_boo
      }
 }
 
-
 void MKBRKGen(MKBRKey& mkBRK,const MKLweKey& mklwe_sk,const vector<SKey_boot>& vec_sk_boot,MKHEParams *parmk){
      int n=parmk->n;
      int N=parmk->N;
      int parties=parmk->parties;
      vector<NGSFFTctxt> BRK;
      SKey_boot sk_boot;
-
      for(int i=0;i<parties;i++){
           SKey_base_LWE sk_base(mklwe_sk.begin() + i*n, mklwe_sk.begin() + (i+1)*n);
           sk_boot=vec_sk_boot[i];
           BRKGen(BRK,sk_base,sk_boot,parmk);
           mkBRK.push_back(BRK);
      }
-
-
-
-
-
-
 }
-
-
-
-
-
 
 void MKBOOTSKGen(vector<SKey_boot> &vec_sk_boot,MKHEParams *parmk){
      int N=parmk->N;
@@ -425,8 +372,6 @@ void MKBOOTSKGen(vector<SKey_boot> &vec_sk_boot,MKHEParams *parmk){
           vec_sk_boot.push_back(sk_boot);
      }
 }
-
-
 
 void LKSKGen(vector<KSKey_LWE> &lksk,const vector<int>& sk_in,const vector<int>& sk_out,MKHEParams *parmk){
      int B=parmk->B_l;

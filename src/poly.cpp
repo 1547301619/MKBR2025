@@ -2,8 +2,6 @@
 #include <algorithm>
 using namespace std;
 
-
-
 void get_uniform_vector(vector<int>& vec,int Q)
 {   long q=Q;
     uniform_int_distribution<int> mod_q_base_sampler=uniform_int_distribution<int>(-q/2, q/2);
@@ -41,7 +39,6 @@ void get_hwt_vector(vector<int>& vec, int h) {
     }
 }
 
-
 void get_gadget(vector<FFTPoly> &g,int N,int B,int d){
     FFT_engine fftN(N);
     ModQPoly g_poly(N,0);
@@ -53,9 +50,6 @@ void get_gadget(vector<FFTPoly> &g,int N,int B,int d){
         mult_fft_poly_by_int(g_FFT,B);
     }
 }
-
-
-
 
 void polymul(vector<int>& res,const vector<int>& a,const vector<int>& b,long q){
     assert(a.size()==b.size());
@@ -71,9 +65,6 @@ void polymul(vector<int>& res,const vector<int>& a,const vector<int>& b,long q){
     printpoly(c);
     lazy_mod_q(res,c,q,q/2);
 }
-
-// void polyvector_product();
-
 
 void gadget_decomp(vector<FFTPoly>& res_vector,const vector<int>& poly,int b, int shift, int l){
     int N = poly.size();
@@ -120,8 +111,6 @@ void gadget_decomp(vector<FFTPoly>& res_vector,const vector<int>& poly,int b, in
     }
 }
 
-
-
 void mod_q_poly(ModQPoly& v,int Q){
     int Q_half=Q/2;
     for(int i=0;i<v.size();i++){
@@ -133,8 +122,6 @@ void mod_q_poly(ModQPoly& v,int Q){
     v[i]=coef;
     }
 }
-
-
 
 void mod_q_poly(ModQPoly& v){
     for(int i=0;i<v.size();i++){
@@ -166,9 +153,6 @@ int mod_q_poly(const int input,int Q){
     return coef;
 }
 
-
-
-
 void mod_q_poly(ModQPoly& v,vector<long> tmp_long,int Q){
     long Q_long=long(Q);
     long Q_long_half=long(Q/2);
@@ -182,10 +166,6 @@ void mod_q_poly(ModQPoly& v,vector<long> tmp_long,int Q){
     }
 }
 
-
-
-
-
 void mod_q_poly(ModQPoly& v,vector<long> tmp_long){
     for(int i=0;i<v.size();i++){
         int coef = tmp_long[i]%Q_long;
@@ -197,7 +177,6 @@ void mod_q_poly(ModQPoly& v,vector<long> tmp_long){
     }
 }
 
-
 int mod_q_lwe(long input,int q,int q_half){
     int coef = input%q;
     if (coef > q_half)
@@ -206,7 +185,6 @@ int mod_q_lwe(long input,int q,int q_half){
         return coef + q;
     return coef;
 }
-
 
 int mod_q_lwe(int input,int q,int q_half){
     int coef = input%q;
@@ -217,16 +195,11 @@ int mod_q_lwe(int input,int q,int q_half){
     return coef;
 }
 
-
 void modulo_switch_poly(ModQPoly& v,int old_q,int new_q){
     double ratio = double(new_q)/double(old_q);
     for (int i=0;i<v.size();i++)
         v[i] = int(round(double(v[i])*ratio));
 }
-
-
-
-
 
 void get_invertible_vector(vector<int>& vec, vector<int>& vec_inv, int scale, int shift)
 {
@@ -333,8 +306,6 @@ void get_invertible_vector_gaussic(vector<int>& vec, vector<int>& vec_inv,double
     }
 }
 
-
-
 void get_invertible_vector(vector<int>& vec, vector<int>& vec_inv, int scale,int N,int Q)
 {
     //polynomial with the coefficient vector vec (will be generated later)
@@ -374,8 +345,6 @@ void get_invertible_vector(vector<int>& vec, vector<int>& vec_inv, int scale,int
         }
     }
 
-    // cout<<poly<<endl;
-
     //extract the coefficient vector of poly
     int tmp_coef;
     for (int i = 0; i <= deg(poly); i++)
@@ -395,7 +364,6 @@ void get_invertible_vector(vector<int>& vec, vector<int>& vec_inv, int scale,int
     }
 }
 
-
 void get_invertible_poly(vector<int>& vec_inv, vector<int>& vec,int N,int Q)
 {
     //polynomial with the coefficient vector vec (will be generated later)
@@ -404,8 +372,6 @@ void get_invertible_poly(vector<int>& vec_inv, vector<int>& vec,int N,int Q)
     coef.init(ZZ(Q));
     //the inverse of poly modulo poly_mod (will be generated later)
     ZZ_pX inv_poly;
-    //random sampling
-
     // X^N + 1
     ZZ_pX modulus;
     SetCoeff(modulus, 0, 1); 
@@ -428,8 +394,6 @@ void get_invertible_poly(vector<int>& vec_inv, vector<int>& vec,int N,int Q)
     }
 }
 
-
-
 void get_ternary_vector(vector<int>& vec)
 {
     for(int i=0; i<vec.size(); i++)
@@ -441,9 +405,6 @@ void get_binary_vector(vector<int>& vec){
     vec[i] = binary_sampler(rand_engine);
 }
 
-
-
-
 int errestimator(const ModQPoly& v,int std){
     int erracc=0;
     for(int i=0;i<v.size();i++){
@@ -454,8 +415,6 @@ int errestimator(const ModQPoly& v,int std){
     return errdev;
 }
 
-
-
 void print_hamin(vector<int> vec){
     int count=0;
     for(int i=0;i<vec.size();i++){
@@ -465,7 +424,6 @@ void print_hamin(vector<int> vec){
     }
     cout<<"hamin weight="<<count<<endl;
 }
-
 
 void external_product(vector<long>& res, const vector<int>& poly, const vector<FFTPoly>& poly_vector, int b, int shift, int l,int N,int N2p1)
 { 

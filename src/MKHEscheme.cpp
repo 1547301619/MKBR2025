@@ -1,7 +1,6 @@
 #include "MKHEscheme.h"
 using namespace std;
 
-
 MKHEscheme::MKHEscheme(BINFHE_PARAMSET set,int v){
 
     static const std::map<BINFHE_PARAMSET, MKHEParams> paramMap = {
@@ -41,11 +40,9 @@ MKHEscheme::MKHEscheme(BINFHE_PARAMSET set,int v){
     cout<<"------------------KEYGEN SUCCESS------------------"<<endl;
 }
 
-
 void MKHEscheme::MKHEencrypt(MKLweSample &result,const MKLweKey& key,int m,MKHEParams *parmk){
     int n=result.n;
     int parties=result.parties;
-
     Sampler s(parLWE);
     normal_distribution<double> gaussian_sampler(0.0, parmk->stdev_LWEerr);
     int b=parLWE.delta_base*m+static_cast<int>(round(gaussian_sampler(rand_engine)));
@@ -80,8 +77,6 @@ int MKHEscheme::MKHEDecrypt(const MKLweSample &ctxt,const MKLweKey& key,MKHEPara
     return output;
 }
 
-
-
 void MKBootstrap_v1(MKLweSample &result,const MKLweSample &ct,const MKBRKey& mkBRK,const vector<vector<FFTPoly>> &mkReKey,const vector<vector<FFTPoly>> &mkrksk,const MKlksk& mklksk,MKHEParams *parmk){
     int N=parmk->N;
     int k=parmk->parties;
@@ -93,8 +88,6 @@ void MKBootstrap_v1(MKLweSample &result,const MKLweSample &ct,const MKBRKey& mkB
     int B=parmk->B_r;
     int shift=parmk->shift_r;
     int d=parmk->d_r;
-
-    
     int b=int((ct.b*N2)/q);
     int *a=ct.a;
 
@@ -122,9 +115,7 @@ void MKBootstrap_v1(MKLweSample &result,const MKLweSample &ct,const MKBRKey& mkB
         c_ntru=acc;
     }
 
- 
     vector<ModQPoly> mkrlwe_c(k+1);
-
     //g^(c) * RKSK
     for(int i=0;i<=k;i++){
         external_product(tmp_long,acc,mkrksk[i],B,shift,d,N,N2p1);
@@ -133,21 +124,15 @@ void MKBootstrap_v1(MKLweSample &result,const MKLweSample &ct,const MKBRKey& mkB
     }
 
     mkrlwe_c[0][0]+=Q/8; 
-
     MKLweSample c_z(Q,N,k);
     MKExtract(c_z,mkrlwe_c,parmk);   //in ZQ
-    
     MKModSwitch(c_z,Q,q,parmk);  //in zq
-
     MKkeyswitch(result,c_z,mklksk,parmk);
 
     a = nullptr; 
 }
 
-
-
 void MKBootstrap_v2(MKLweSample &result,const MKLweSample &ct,const MKBRKey &mkBRK,const vector<vector<FFTPoly>> &mkreKey,const vector<vector<FFTPoly>> &nrk0,const vector<RGSWKey> &nrk1,const MKlksk& mklksk,MKHEParams *parmk){
-     
     int N=parmk->N;
     int k=parmk->parties;
     int q=parmk->q;
@@ -158,7 +143,6 @@ void MKBootstrap_v2(MKLweSample &result,const MKLweSample &ct,const MKBRKey &mkB
     int B=parmk->B_r;
     int shift=parmk->shift_r;
     int d=parmk->d_r;
-    
     int b=int((ct.b*N2)/q);
     int *a=ct.a;
  
@@ -180,10 +164,8 @@ void MKBootstrap_v2(MKLweSample &result,const MKLweSample &ct,const MKBRKey &mkB
     for (int i = b_pow; i < N; ++i)
         acc[i] = (b_sign == 1) ? acc[i]: -acc[i];
 
-
     ModQPoly c_ntru=acc;
     SingleKeyReBR(acc,a,c_ntru,mkreKey[0],mkBRK[0],parmk);
-
 
     vector<ModQPoly> rlwe_c(2);
     for(int i=0;i<2;i++){
@@ -192,32 +174,24 @@ void MKBootstrap_v2(MKLweSample &result,const MKLweSample &ct,const MKBRKey &mkB
         rlwe_c[i]=tmp_poly;
     }
    
- 
     vector<ModQPoly> rlwe_res(2);
     for(int i=1;i<k;i++){
         SingleKeyReBR(acc,a+n*i,rlwe_c[0],mkreKey[i],mkBRK[i],parmk);
         rlwe_c[0]=acc;
-
         SingleKeyReBR(acc,a+n*i,rlwe_c[1],mkreKey[i],mkBRK[i],parmk);
         rlwe_c[1]=acc;
-
         //nrk1[i-1]=partyi Vi
         RLWE_RGSWproduct(rlwe_res,rlwe_c,nrk1[i-1],parmk);
         rlwe_c=rlwe_res;
     }
 
-
-
     rlwe_c[0][0]+=Q/8; 
-
     MKLweSample c_z(Q,N,k);
     RlweExtract(c_z,rlwe_c,parmk);   //in ZQ
     LWEModSwitch(c_z,Q,q,parmk);  //in zq
     MKkeyswitch_v2(result,c_z,mklksk,parmk);
     a = nullptr; 
 }
-
-
 
 void SingleKeyReBR(ModQPoly &acc, int *al,const ModQPoly& c,const NGSFFTctxt& ReKey,const vector<NGSFFTctxt>& BRK,MKHEParams *parmk){
     int N = parmk->N;
@@ -228,26 +202,18 @@ void SingleKeyReBR(ModQPoly &acc, int *al,const ModQPoly& c,const NGSFFTctxt& Re
     int B=parmk->B_n;
     int shift=parmk->shift_n;
     int d=parmk->d_n;
-
-
     vector<int> tmp_poly(N);
     vector<long> tmp_poly_long(N);
 
     acc.resize(N,0L);
-
-
     //acc=c * brk_n , Rekey=brk_n
     external_product(tmp_poly_long, c, ReKey, B, shift, d,N,N2p1);   
     mod_q_boot(acc, tmp_poly_long);
-
-
     vector<int> a(al,al+n);
     // switch to modulus 2*N
     modulo_switch_a(a, q, N2,n);
 
-
     int coef, coef_sign;
-
     for(int i=0;i<n;i++){
             coef = a[i];
             if (coef == 0) continue;
@@ -281,14 +247,9 @@ void SingleKeyReBR(ModQPoly &acc, int *al,const ModQPoly& c,const NGSFFTctxt& Re
             // acc * (X^coef - 1) x brk[i] + acc
             for (int i = 0; i<N; ++i)
                 acc[i] += tmp_poly[i];
-
-            mod_q_boot(acc); //if Q=2^27
+            mod_q_boot(acc); 
         }
-
 }
-
-
-
 
 void MKkeyswitch(MKLweSample &result,const MKLweSample &input,const MKlksk& mklksk,MKHEParams *parmk){
     int n=parmk->n;
@@ -358,10 +319,8 @@ void MKkeyswitch(MKLweSample &result,const MKLweSample &input,const MKlksk& mklk
     }
 
     a_in=nullptr;
-
 }
 
-//used in MKboot_v9
 void MKkeyswitch_v2(MKLweSample &result,const MKLweSample &input,const MKlksk& mklksk,MKHEParams *parmk){
     int n=parmk->n;
     assert(result.n==n);
@@ -430,7 +389,6 @@ void MKkeyswitch_v2(MKLweSample &result,const MKLweSample &input,const MKlksk& m
     }
 
     a_in=nullptr;
-
 }
 
 void MKExtract(MKLweSample& result,const vector<ModQPoly>& mkrlwe_c,MKHEParams *parmk){
@@ -438,7 +396,6 @@ void MKExtract(MKLweSample& result,const vector<ModQPoly>& mkrlwe_c,MKHEParams *
     assert(result.n==N);
     int parties=parmk->parties;
     result.b=mkrlwe_c[0][0];
-
     for(int i=1;i<=parties;i++){
         for(int j=0;j<N;j++){
             result.a[(i-1)*N+j]=mkrlwe_c[i][j];
@@ -446,20 +403,14 @@ void MKExtract(MKLweSample& result,const vector<ModQPoly>& mkrlwe_c,MKHEParams *
     }
 }
 
-
-
 void RlweExtract(MKLweSample& result,const vector<ModQPoly>& rlwe_c,MKHEParams *parmk){
     int N=parmk->N;
     assert(result.n==N);
     result.b=rlwe_c[0][0];
-
     for(int j=0;j<N;j++){
         result.a[j]=rlwe_c[1][j];
     }
-
 }
-
-
 
 void MKExtractKey(MKLweKey& mklwe_sk_z,const MKRLweKey& mkrlwe_key,MKHEParams *parmk){
     int N=parmk->N;
@@ -497,7 +448,6 @@ void MKModSwitch(MKLweSample &result,int oldQ,int newQ,MKHEParams *parmk){
         result.a[i] = int(round(double(result.a[i])*radio));
 }
 
-
 void LWEModSwitch(MKLweSample &result,int oldQ,int newQ,MKHEParams *parmk){
     int N=parmk->N;
     int k=parmk->parties;
@@ -507,7 +457,6 @@ void LWEModSwitch(MKLweSample &result,int oldQ,int newQ,MKHEParams *parmk){
     for (int i=0;i<N;i++)
         result.a[i] = int(round(double(result.a[i])*radio));
 }
-
 
 void MKRlweDec(ModQPoly &res,const vector<ModQPoly>& c,const vector<FFTPoly>& z,MKHEParams *parmk,int Q){
     int N=parmk->N;

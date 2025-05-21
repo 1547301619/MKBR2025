@@ -1,8 +1,5 @@
 #include "MKLwe.h"
 
-
-
-
 MKLweSample::MKLweSample(int q,int n,int parties):
 q(q),n(n),parties(parties)
 {
@@ -10,26 +7,17 @@ q(q),n(n),parties(parties)
     this->b=0;
 }
 
-
 MKLweSample::MKLweSample(){};
 
-MKLweSample::~MKLweSample() {
-    // if (a != nullptr) {
-    //     delete[] a;
-    //     a = nullptr;
-    // }
-}
-
+MKLweSample::~MKLweSample() {}
 
 MKLweSample& MKLweSample::operator=(const MKLweSample& other){
         if (this == &other) { 
             return *this;
         }
-
         if (a != nullptr) {
             delete[] a;
         }
-
         n = other.n;
         parties = other.parties;
         b = other.b;
@@ -40,7 +28,6 @@ MKLweSample& MKLweSample::operator=(const MKLweSample& other){
         }
         return *this; 
 }
-
 
 MKLweSample MKLweSample::operator+(const MKLweSample& other){
     int q_half=q/2;
@@ -53,7 +40,6 @@ MKLweSample MKLweSample::operator+(const MKLweSample& other){
     return res;
 }
 
-
 MKLweSample MKLweSample::operator-(const MKLweSample& other){
     int q_half=q/2;
     MKLweSample res(q,n,parties);
@@ -63,7 +49,6 @@ MKLweSample MKLweSample::operator-(const MKLweSample& other){
     res.b=mod_q_lwe(b+other.b,q,q_half);
     return res;
 }
-
 
 MKLweSample operator-(const int c, const MKLweSample& other){
     int q=other.q;

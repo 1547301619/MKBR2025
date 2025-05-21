@@ -5,24 +5,14 @@
 #include <stdexcept>
 #include <chrono>
 #include <limits.h>
-
 #include <NTL/ZZX.h>
 #include <NTL/ZZ_pE.h>
-
 #include "FINAL.h"
-
 #include <cmath> 
 #include "MKHEscheme.h"
 
-
 using namespace std;
 using namespace NTL;
-
-
-enum GateType {NAND, AND, OR, XOR, NOT};
-
-
-
 
 void test_nandbootstrap_v1(BINFHE_PARAMSET set){
     MKHEscheme MKhe(set,1);
@@ -30,7 +20,6 @@ void test_nandbootstrap_v1(BINFHE_PARAMSET set){
     int k=MKhe.parmk.parties;
     int q=MKhe.parmk.q;
     int nand_const=MKhe.parmk.nand_const;
-
     int m1=binary_sampler(rand_engine);
     int m2=binary_sampler(rand_engine);
     MKLweSample c1(q,n,k);
@@ -42,15 +31,11 @@ void test_nandbootstrap_v1(BINFHE_PARAMSET set){
     MKLweSample c_nand(q,n,k);
     MKLweSample c_nandboot(q,n,k);
 
-
- 
-
     clock_t start = clock();
     c_nand=nand_const-(c1+c2);
     MKBootstrap_v1(c_nandboot,c_nand,MKhe.mkBRK,MKhe.mkReKey,MKhe.mkrksk,MKhe.mklksk,&MKhe.parmk); 
     cout<<"NAND_Bootstrap_v1:"<<float(clock()-start)* 1000/CLOCKS_PER_SEC<<"ms"<<endl;
     
-
     int m_nand=MKhe.MKHEDecrypt(c_nand,MKhe.mklwe_sk,&MKhe.parmk);
     int m_boot=MKhe.MKHEDecrypt(c_nandboot,MKhe.mklwe_sk,&MKhe.parmk);
 
@@ -64,7 +49,6 @@ void test_nandbootstrap_v1(BINFHE_PARAMSET set){
 }
 
 void test_nandbootstrap_v2(BINFHE_PARAMSET set){
-
     MKHEscheme MKhe(set,2);
     int n=MKhe.parmk.n;
     int k=MKhe.parmk.parties;
@@ -85,7 +69,6 @@ void test_nandbootstrap_v2(BINFHE_PARAMSET set){
     MKBootstrap_v2(c_nandboot,c_nand,MKhe.mkBRK,MKhe.mkReKey,MKhe.nrk0,MKhe.nrk1,MKhe.mklksk,&MKhe.parmk); 
     cout<<"NAND_Bootstrap_v2:"<<float(clock()-start)* 1000/CLOCKS_PER_SEC<<"ms"<<endl;
     
-
     int m_nand=MKhe.MKHEDecrypt(c_nand,MKhe.mklwe_sk,&MKhe.parmk);
     int m_boot=MKhe.MKHEDecrypt(c_nandboot,MKhe.mklwe_sk,&MKhe.parmk);
 
@@ -98,29 +81,10 @@ void test_nandbootstrap_v2(BINFHE_PARAMSET set){
     }
 }
 
-
-
-
-
-
-
 int main()
 {   
-
-
     test_nandbootstrap_v1(MKHE2party_v1);
-
     //PARAM_MKHE4party_v2/  PARAM_MKHE8party_v2/ PARAM_MKHE16party_v2
     test_nandbootstrap_v2(MKHE2party_v2);
-    
-
-
- 
-
-
-
-    
     return 0;
-    
-    
 }
