@@ -2,7 +2,6 @@
 using namespace std;
 
 MKHEscheme::MKHEscheme(BINFHE_PARAMSET set,int v){
-
     static const std::map<BINFHE_PARAMSET, MKHEParams> paramMap = {
         {MKHE2party_v1, PARAM_MKHE2party_v1},
         {MKHE2party_v2, PARAM_MKHE2party_v2},
@@ -11,7 +10,6 @@ MKHEscheme::MKHEscheme(BINFHE_PARAMSET set,int v){
         {MKHE16party_v2, PARAM_MKHE16party_v2}
     };
 
-   
     auto it = paramMap.find(set);
     if (it != paramMap.end()) {
         this->parmk = it->second; 
@@ -20,7 +18,6 @@ MKHEscheme::MKHEscheme(BINFHE_PARAMSET set,int v){
     }
 
     cout<<"----------------------KEYGEN---------------------"<<endl;
-
     MKLweKeyGen(mklwe_sk,&parmk);
     MKBOOTSKGen(vec_sk_boot,&parmk);
     MKRLweKeyGen(mkrlwe_key,&parmk);
@@ -29,14 +26,12 @@ MKHEscheme::MKHEscheme(BINFHE_PARAMSET set,int v){
     MKLKSKGen(mklksk,mklwe_sk_z,mklwe_sk,&parmk);
     MKReKeyGen(mkReKey,vec_sk_boot,&parmk);
     MKBRKGen(mkBRK,mklwe_sk,vec_sk_boot,&parmk);
-
     if(v==1){
        MKrkskGen(mkrksk,mkhpk,mkrlwe_key,&parmk);
     }
     if(v==2){
        NRKGen(nrk0,nrk1,vec_sk_boot,mkrlwe_key,&parmk);
     }
-
     cout<<"------------------KEYGEN SUCCESS------------------"<<endl;
 }
 
